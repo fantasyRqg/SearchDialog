@@ -116,6 +116,18 @@ public class SearchFragment extends DialogFragment implements DialogInterface.On
         searchHistoryAdapter.setOnItemClickListener(this);
         //监听编辑框文字改变
         etSearchKeyword.addTextChangedListener(new TextWatcherImpl());
+
+        etSearchKeyword.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    KeyBoardUtils.openKeyboard(getContext(), etSearchKeyword);
+                } else {
+                    KeyBoardUtils.closeKeyboard(getContext(), etSearchKeyword);
+                }
+            }
+        });
+
         //监听点击
         ivSearchBack.setOnClickListener(this);
         viewSearchOutside.setOnClickListener(this);
@@ -182,13 +194,21 @@ public class SearchFragment extends DialogFragment implements DialogInterface.On
         dismiss();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        KeyBoardUtils.closeKeyboard(getContext(), etSearchKeyword);
+    }
+
     /**
      * 搜索框动画显示完毕时调用
      */
     @Override
     public void onShowAnimationEnd() {
         if (isVisible()) {
-            KeyBoardUtils.openKeyboard(getContext(), etSearchKeyword);
+//            KeyBoardUtils.openKeyboard(getContext(), etSearchKeyword);
+            etSearchKeyword.requestFocus();
         }
     }
 
