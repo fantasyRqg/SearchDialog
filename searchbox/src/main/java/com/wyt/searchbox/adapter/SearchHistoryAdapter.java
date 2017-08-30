@@ -19,9 +19,26 @@ public class SearchHistoryAdapter extends RecyclerView.Adapter<SearchHistoryAdap
 
     private ArrayList<String> historys = new ArrayList<>();
 
+    private int mSelectedIndex = -1;
+
     public SearchHistoryAdapter(Context context, ArrayList<String> historys) {
         this.context = context;
         this.historys = historys;
+    }
+
+    public int getSelectedIndex() {
+        return mSelectedIndex;
+    }
+
+    public void setSelectedIndex(int selectedIndex) {
+        mSelectedIndex = selectedIndex;
+    }
+
+    public String getSearchKey(int index) {
+        if (index >= 0 && index < historys.size())
+            return historys.get(index);
+
+        return null;
     }
 
     @Override
@@ -49,6 +66,12 @@ public class SearchHistoryAdapter extends RecyclerView.Adapter<SearchHistoryAdap
             }
         });
 
+
+        if (position == mSelectedIndex) {
+            holder.itemView.setBackgroundResource(R.drawable.round_stroke_black_bg);
+        } else {
+            holder.itemView.setBackground(null);
+        }
     }
 
     @Override

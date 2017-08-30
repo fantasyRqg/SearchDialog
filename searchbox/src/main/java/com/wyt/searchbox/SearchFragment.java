@@ -9,6 +9,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -90,9 +91,9 @@ public class SearchFragment extends DialogFragment implements DialogInterface.On
         etSearchKeyword = (EditText) view.findViewById(R.id.et_search_keyword);
         ivSearchSearch = (ImageView) view.findViewById(R.id.iv_search_search);
         rvSearchHistory = (RecyclerView) view.findViewById(R.id.rv_search_history);
-        searchUnderline = (View) view.findViewById(R.id.search_underline);
+        searchUnderline = view.findViewById(R.id.search_underline);
         tvSearchClean = (TextView) view.findViewById(R.id.tv_search_clean);
-        viewSearchOutside = (View) view.findViewById(R.id.view_search_outside);
+        viewSearchOutside = view.findViewById(R.id.view_search_outside);
 
         //实例化动画效果
         mCircularRevealAnim = new CircularRevealAnim();
@@ -167,10 +168,67 @@ public class SearchFragment extends DialogFragment implements DialogInterface.On
      */
     @Override
     public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+        Log.d(TAG, "onKey() called with: dialog = [" + dialog.hashCode() + "], keyCode = [" + KeyEvent.keyCodeToString(keyCode) + "], event = [" + event + "]");
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP) {
             hideAnim();
+            return true;
         } else if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
             search();
+            return true;
+        } else if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            switch (keyCode) {
+                case KeyEvent.KEYCODE_DPAD_CENTER: {
+                    String searchKey = searchHistoryAdapter.getSearchKey(searchHistoryAdapter.getSelectedIndex());
+                    if (iOnSearchClickListener != null && searchKey != null)
+                        iOnSearchClickListener.OnSearchClick(searchKey);
+                }
+                return true;
+
+//                case KeyEvent.KEYCODE_DPAD_LEFT:
+//                    break;
+//
+//                case KeyEvent.KEYCODE_DPAD_RIGHT:
+//                    break;
+
+                case KeyEvent.KEYCODE_DPAD_UP: {
+
+                    int index = searchHistoryAdapter.getSelectedIndex();
+                    if (index == 0) {
+                        rvSearchHistory.clearFocus();
+                        etSearchKeyword.requestFocus();
+                    }
+                    if (index >= 0) {
+                        searchHistoryAdapter.setSelectedIndex(index - 1);
+                        searchHistoryAdapter.notifyDataSetChanged();
+                    }
+
+
+                }
+
+                return true;
+
+
+                case KeyEvent.KEYCODE_DPAD_DOWN: {
+                    int index = searchHistoryAdapter.getSelectedIndex();
+                    if (index < searchHistoryAdapter.getItemCount()) {
+                        searchHistoryAdapter.setSelectedIndex(index + 1);
+                        searchHistoryAdapter.notifyDataSetChanged();
+                    }
+
+                    if (searchHistoryAdapter.getSelectedIndex() == 0) {
+                        etSearchKeyword.clearFocus();
+                        rvSearchHistory.requestFocus();
+                    }
+                }
+                return true;
+
+            }
+        } else if (keyCode == KeyEvent.KEYCODE_DPAD_UP && event.getAction() == KeyEvent.ACTION_UP) {
+            if (etSearchKeyword.isFocused()) {
+                etSearchKeyword.clearFocus();
+                rvSearchHistory.requestFocus();
+                return true;
+            }
         }
         return false;
     }
