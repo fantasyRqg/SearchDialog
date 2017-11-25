@@ -179,8 +179,10 @@ public class SearchFragment extends DialogFragment implements DialogInterface.On
             switch (keyCode) {
                 case KeyEvent.KEYCODE_DPAD_CENTER: {
                     String searchKey = searchHistoryAdapter.getSearchKey(searchHistoryAdapter.getSelectedIndex());
-                    if (iOnSearchClickListener != null && searchKey != null)
+                    if (iOnSearchClickListener != null && searchKey != null) {
                         iOnSearchClickListener.OnSearchClick(searchKey);
+                        hideAnim();
+                    }
                 }
                 return true;
 
